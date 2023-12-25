@@ -127,38 +127,39 @@ class EVDataVisualizer:
         # EV到达时隙的频数直方图
         plt.subplot(1, 3, 1)
         plt.hist(EV['J_c'], bins=96, range=(0.5, 96.5))
-        plt.title('EV到达时间槽直方图 - ' + title)
-        plt.xlabel('到达时间槽')
-        plt.ylabel('频率')
+        plt.title('EV Arrival Time Slot Histogram - ' + title)
+        plt.xlabel('Arrival Time Slot')
+        plt.ylabel('Frequency')
 
         # EV到达时间的频率直方图
         plt.subplot(1, 3, 2)
         plt.hist(EV['t_c'], bins=24, range=(0, 24), density=True)
-        plt.title('EV到达时间频率直方图 - ' + title)
-        plt.xlabel('到达时间 (小时)')
-        plt.ylabel('频率')
-
-        # EV电池状态SOC的散点图
-        plt.subplot(1, 3, 3)
-        plt.scatter(np.arange(len(EV)), EV['SOC_con'], label='SOC_con')
-        plt.scatter(np.arange(len(EV)), EV['SOC_min'], label='SOC_min')
-        plt.scatter(np.arange(len(EV)), EV['SOC_max'], label='SOC_max')
-        plt.title('EV电池状态SOC散点图 - ' + title)
-        plt.xlabel('EV编号')
-        plt.ylabel('SOC')
-        plt.legend()
+        plt.title('EV Arrival Time Frequency Histogram - ' + title)
+        plt.xlabel('Arrival Time (Hours)')
+        plt.ylabel('Frequency')
 
         plt.tight_layout()
+        plt.show()
+
+        # EV电池状态SOC的散点图
+        plt.figure(figsize=(8, 5))
+        plt.scatter(np.arange(len(EV)), EV['SOC_con'], label='SOC Current', s=10)
+        plt.scatter(np.arange(len(EV)), EV['SOC_min'], label='SOC Minimum', s=10)
+        plt.scatter(np.arange(len(EV)), EV['SOC_max'], label='SOC Maximum', s=10)
+        plt.title('EV Battery State of Charge (SOC) Scatter Plot - ' + title)
+        plt.xlabel('EV Index')
+        plt.ylabel('State of Charge (SOC)')
+        plt.legend()
         plt.show()
 
     def figureResult(self, P_basic, P_SOC_crd, title):
         # 充电模式结果可视化
         plt.figure(figsize=(12, 6))
-        plt.plot(P_basic, label='基础负载')
-        plt.plot(P_SOC_crd, label='协调后负载', linestyle='--')
-        plt.xlabel('时间槽')
-        plt.ylabel('负载 (KW)')
-        plt.title('充电模式 - ' + title)
+        plt.plot(P_basic, label='Basic load')
+        plt.plot(P_SOC_crd, label='Optimized load', linestyle='--')
+        plt.xlabel('Time')
+        plt.ylabel('Load (KW)')
+        plt.title('Charging mode - ' + title)
         plt.legend()
         plt.show()
 
@@ -180,16 +181,16 @@ def main():
     x_public, P_basic_public, P_SOC_crd_public = optimizer.chargingPattern(EV_public, 'public')
 
     # 可视化家庭充电模式下的EV数据
-    visualizer.printEVData(EV_home, "家庭充电模式")
+    visualizer.printEVData(EV_home, "Home charging")
 
     # 可视化公共充电模式下的EV数据
-    visualizer.printEVData(EV_public, "公共充电模式")
+    visualizer.printEVData(EV_public, "Public charging ")
 
     # 可视化家庭充电模式的优化结果
-    visualizer.figureResult(P_basic_home, P_SOC_crd_home, "家庭充电模式优化结果")
+    visualizer.figureResult(P_basic_home, P_SOC_crd_home, "Home charging optimization results")
 
     # 可视化公共充电模式的优化结果
-    visualizer.figureResult(P_basic_public, P_SOC_crd_public, "公共充电模式优化结果")
+    visualizer.figureResult(P_basic_public, P_SOC_crd_public, "Public charging optimization results")
 
     print("done")
 
