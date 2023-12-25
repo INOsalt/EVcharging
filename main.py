@@ -56,12 +56,12 @@ class EVChargingDataGenerator:
 
 
 class EVChargingOptimizer:
-    def __init__(self, P_BASIC, CAP_BAT_EV=30, ETA_EV=0.9, P_SLOW_EV=3.5, P_FAST_EV=10, DELTA_T=0.25):
+    def __init__(self, P_BASIC,P_SLOW_EV=3.5, P_FAST_EV=10, DELTA_T=0.25):
         # 初始化参数
         self.P_BASIC = P_BASIC  # 基本负载数据
-        self.CAP_BAT_EV = CAP_BAT_EV  # 电池容量（单位：KW/H）
-        self.ETA_EV = ETA_EV  # 充电效率
-        self.P_SLOW_EV = P_SLOW_EV  # 慢速充电功率
+        self.CAP_BAT_EV = 30  # 电池容量（单位：KW/H）
+        self.ETA_EV = 0.9  # 充电效率
+        self.P_SLOW_EV = 3.5  # 慢速充电功率
         self.P_FAST_EV = P_FAST_EV  # 快速充电功率
         self.DELTA_T = DELTA_T  # 时间间隔
         self.solver = cp.GLPK_MI  # 定义求解器
@@ -88,9 +88,11 @@ class EVChargingOptimizer:
         return self._optimizeChargingPattern(EV, mode)
 
     def _defineOptimization(self, EV, x, P_basic):
-        # 定义通用优化模型
         n = len(EV)
         constraints = []
+
+        # 计算充电需求
+        EV['CUI'] = (EV['J_dis'] - EV['J_c']) * self.DELTA_T * self.P_SLOW_EV * self.ETA_EV - (EV['SOC_min'] - EV['SOC_con']) * self.CAP_BAT_EV
 
         # 车辆未接入时的时隙应为0
         for i in range(n):
@@ -189,7 +191,9 @@ def main():
     # 可视化公共充电模式的优化结果
     visualizer.figureResult(P_basic_public, P_SOC_crd_public, "公共充电模式优化结果")
 
+    print("done")
+
 if __name__ == "__main__":
-    main
+    main()
 
 
